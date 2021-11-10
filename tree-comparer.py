@@ -5,13 +5,13 @@ import logging
 import os
 import sys
 
-logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+# Buffer size used when calculating the hash
 BUF_SIZE = 65536  # 64kb chunks
 
+logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+
 def hash(file: str) -> str:
-
     sha1 = hashlib.sha1()
-
     try:
         with open(file, 'rb') as f:
             while True:
@@ -25,76 +25,86 @@ def hash(file: str) -> str:
         return "<invalid-hash>"
 
 
-def compare(reference_directory: str, test_directory: str):
+def compare(reference: str, test: str, check_size = True, check_hash = True):
     
-    if not isinstance(reference_directory, str):
+    if not isinstance(reference, str):
         logging.critical("Invalid reference directory")
         return
-    if not isinstance(test_directory, str):
+    if not isinstance(test, str):
         logging.critical("Invalid test directory")
         return
-    if reference_directory == test_directory:
+    if reference == test:
         return
 
-    listed_dir = None
+    listed_reference = None
     try:
-        listed_dir = os.listdir(reference_directory)
+        listed_reference = os.listdir(reference)
     except Exception as e:
         logging.critical(e)
         return
 
-    for relative_file_path in listed_dir:
+    # Compare first relative to test
+    for relative_reference_file in listed_reference:
 
-        relative_reference_file = os.path.join(reference_directory, relative_file_path)
-        file_test_directory = os.path.join(test_directory, relative_file_path)
+        absolute_reference_file = os.path.join(reference, relative_reference_file)
+        absolute_test_file = os.path.join(test, relative_reference_file)
 
         # If the reference file is a regular file
-        if os.path.isfile(relative_reference_file):
+        if os.path.isfile(absolute_reference_file):
 
             # Check if a regular file exists on other side as well
-            if not os.path.isfile(file_test_directory):
-                logging.error(f'File      "{relative_reference_file}" => does not exist in "{test_directory}"')
+            if not os.path.isfile(absolute_test_file):
+                logging.error(f'File      "{absolute_reference_file}" => does not exist in "{test}"')
                 continue
             
             # Check if the sizes match
-            reference_size = os.path.getsize(relative_reference_file)
-            test_size = os.path.getsize(file_test_directory)
-            if test_size != reference_size:
-                logging.warning(f'File size mismatch {relative_reference_file} ({reference_size} bytes) and {file_test_directory} ({test_size} bytes)')
-                continue
+            if check_size:
+                reference_size = os.path.getsize(absolute_reference_file)
+                test_size = os.path.getsize(absolute_test_file)
+                if test_size != reference_size:
+                    logging.warning(f'File size mismatch {absolute_reference_file} ({reference_size} bytes) and {absolute_test_file} ({test_size} bytes)')
+                    continue
             
             # Check if the hashes match
-            reference_hash = hash(relative_reference_file)
-            test_hash = hash(file_test_directory)
-            if reference_hash != test_hash:
-                logging.warn(f'File hash mismatch "{relative_reference_file}" ({reference_hash}) and "{file_test_directory}" ({test_hash})')
-                continue
+            if check_hash:
+                reference_hash = hash(absolute_reference_file)
+                test_hash = hash(absolute_test_file)
+                if reference_hash != test_hash:
+                    logging.warn(f'File hash mismatch "{absolute_reference_file}" ({reference_hash}) and "{absolute_test_file}" ({test_hash})')
+                    continue
 
         # If the reference file is a directory
-        if os.path.isdir(relative_reference_file):
+        if os.path.isdir(absolute_reference_file):
 
             # Check if a directory exists on other side as well
-            if not os.path.isdir(file_test_directory):
-                logging.error(f'Directory "{relative_reference_file}" => does not exist in "{test_directory}"')
+            if not os.path.isdir(absolute_test_file):
+                logging.error(f'Directory "{absolute_reference_file}" => does not exist in "{test}"')
                 continue
  
-            compare(relative_reference_file, file_test_directory)
+            compare(absolute_reference_file, absolute_test_file, check_size, check_hash)
             
         # If the reference file is a link file
-        if os.path.islink(relative_reference_file):
+        if os.path.islink(absolute_reference_file):
     
             # Check if a link file exists on other side as well
-            if not os.path.islink(file_test_directory):
-                logging.error(f'Link      "{relative_reference_file}" => does not exist in "{test_directory}"')
+            if not os.path.islink(absolute_test_file):
+                logging.error(f'Link      "{absolute_reference_file}" => does not exist in "{test}"')
                 continue
 
-def main(argv):
-    inputfile = argv[1]
-    outputfile = argv[2]
 
-    compare(inputfile, outputfile)
-    compare(outputfile, inputfile)
+def main(argv):
+    if len(argv) != 2:
+        logging.critical("Wrong input arguments count")
+        return
+    reference = argv[0]
+    test = argv[1]
+
+    # Normal reference to test comparison
+    compare(reference, test)
+    
+    # Useful to check if some files that exist in test shouldn't actually exist
+    compare(test, reference, check_size = False, check_hash = False)
 
 
 if __name__ == "__main__":
-    main(sys.argv)
+    main(sys.argv[1:])
