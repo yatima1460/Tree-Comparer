@@ -17,7 +17,7 @@ logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 BUF_SIZE = 65536  # 64kb chunks
 
 
-def hash(file):
+def hash(file: str) -> str:
 
     sha1 = hashlib.sha1()
 
@@ -31,29 +31,21 @@ def hash(file):
         return format(sha1.hexdigest())
     except Exception as e:
         logging.critical(e)
-        return None
-
-def get_parent(path: str) -> str:
-    path = Path(path)
-    return str(path.parent.absolute())
+        return "<invalid-hash>"
 
 
-def compare(reference_directory, test_directory):
+def compare(reference_directory: str, test_directory: str):
     
-    if reference_directory is None:
+    if not isinstance(reference_directory, str):
         logging.critical("Invalid reference directory")
         return
-    if test_directory is None:
+    if not isinstance(test_directory, str):
         logging.critical("Invalid test directory")
         return
     if reference_directory == test_directory:
         return
-    
-    reference_directory_parent = get_parent(reference_directory)
-    test_directory_parent = get_parent(test_directory)
 
     listed_dir = None
-
     try:
         listed_dir = listdir(reference_directory)
     except Exception as e:
