@@ -54,7 +54,7 @@ def compare(REFERENCE : str, TEST: str, CHECK_SIZE = True, CHECK_HASH = True):
 
             # Check if a regular file exists on other side as well
             if not os.path.isfile(ABSOLUTE_TEST_FILE):
-                logging.error(f'File      "{ABSOLUTE_REFERENCE_FILE}" => does not exist in "{TEST}"')
+                logging.error(f'File does not exist "{ABSOLUTE_REFERENCE_FILE}" in "{TEST}"')
                 continue
             
             # Check if the sizes match
@@ -70,7 +70,7 @@ def compare(REFERENCE : str, TEST: str, CHECK_SIZE = True, CHECK_HASH = True):
                 REFERENCE_HASH = hash(ABSOLUTE_REFERENCE_FILE)
                 TEST_HASH = hash(ABSOLUTE_TEST_FILE)
                 if REFERENCE_HASH != TEST_HASH:
-                    logging.warn(f'File hash mismatch "{ABSOLUTE_REFERENCE_FILE}" ({REFERENCE_HASH}) and "{ABSOLUTE_TEST_FILE}" ({TEST_HASH})')
+                    logging.warning(f'File hash mismatch "{ABSOLUTE_REFERENCE_FILE}" ({REFERENCE_HASH}) and "{ABSOLUTE_TEST_FILE}" ({TEST_HASH})')
                     continue
 
         # If the reference file is a directory
@@ -78,7 +78,7 @@ def compare(REFERENCE : str, TEST: str, CHECK_SIZE = True, CHECK_HASH = True):
 
             # Check if a directory exists on other side as well
             if not os.path.isdir(ABSOLUTE_TEST_FILE):
-                logging.error(f'Directory "{ABSOLUTE_REFERENCE_FILE}" => does not exist in "{TEST}"')
+                logging.error(f'Directory does not exist "{ABSOLUTE_REFERENCE_FILE}" in "{TEST}"')
                 continue
  
             compare(ABSOLUTE_REFERENCE_FILE, ABSOLUTE_TEST_FILE, CHECK_SIZE, CHECK_HASH)
@@ -88,7 +88,7 @@ def compare(REFERENCE : str, TEST: str, CHECK_SIZE = True, CHECK_HASH = True):
     
             # Check if a link file exists on other side as well
             if not os.path.islink(ABSOLUTE_TEST_FILE):
-                logging.error(f'Link      "{ABSOLUTE_REFERENCE_FILE}" => does not exist in "{TEST}"')
+                logging.error(f'Link "{ABSOLUTE_REFERENCE_FILE}" => does not exist in "{TEST}"')
                 continue
 
 
