@@ -1,21 +1,12 @@
 #!/usr/bin/python3
 
 import hashlib
-import sys
-import getopt
-from os import listdir
-from os.path import isfile, join
-import os.path
 import logging
-from pathlib import Path
-
-print()
+import os
+import sys
 
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
-
-
 BUF_SIZE = 65536  # 64kb chunks
-
 
 def hash(file: str) -> str:
 
@@ -47,15 +38,15 @@ def compare(reference_directory: str, test_directory: str):
 
     listed_dir = None
     try:
-        listed_dir = listdir(reference_directory)
+        listed_dir = os.listdir(reference_directory)
     except Exception as e:
         logging.critical(e)
         return
 
     for relative_file_path in listed_dir:
 
-        relative_reference_file = join(reference_directory, relative_file_path)
-        file_test_directory = join(test_directory, relative_file_path)
+        relative_reference_file = os.path.join(reference_directory, relative_file_path)
+        file_test_directory = os.path.join(test_directory, relative_file_path)
 
         # If the reference file is a regular file
         if os.path.isfile(relative_reference_file):
