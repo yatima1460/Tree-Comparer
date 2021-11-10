@@ -89,7 +89,13 @@ def compare(reference_directory, test_directory):
  
             compare(relative_reference_file, file_test_directory)
             
-
+        # If the reference file is a link file
+        if os.path.islink(relative_reference_file):
+    
+            # Check if a link file exists on other side as well
+            if not os.path.islink(file_test_directory):
+                logging.error(f'Link      "{relative_reference_file}" => does not exist in "{test_directory}"')
+                continue
 
 def main(argv):
     inputfile = argv[1]
