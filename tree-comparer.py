@@ -41,6 +41,9 @@ def get_parent(path: str) -> str:
 
 def compare(reference_directory, test_directory):
     
+    if reference_directory == test_directory:
+        return
+    
     reference_directory_parent = get_parent(reference_directory)
     test_directory_parent = get_parent(test_directory)
 
