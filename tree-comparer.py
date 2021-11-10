@@ -22,7 +22,6 @@ def hash(file):
     sha1 = hashlib.sha1()
 
     try:
-        listed_dir = listdir(reference_directory)
         with open(file, 'rb') as f:
             while True:
                 data = f.read(BUF_SIZE)
@@ -41,6 +40,12 @@ def get_parent(path: str) -> str:
 
 def compare(reference_directory, test_directory):
     
+    if reference_directory is None:
+        logging.critical("Invalid reference directory")
+        return
+    if test_directory is None:
+        logging.critical("Invalid test directory")
+        return
     if reference_directory == test_directory:
         return
     
@@ -72,7 +77,7 @@ def compare(reference_directory, test_directory):
             reference_size = os.path.getsize(relative_reference_file)
             test_size = os.path.getsize(file_test_directory)
             if test_size != reference_size:
-                logging.warn(f'File size mismatch {relative_reference_file} ({reference_size} bytes) and {file_test_directory} ({test_size} bytes)')
+                logging.warning(f'File size mismatch {relative_reference_file} ({reference_size} bytes) and {file_test_directory} ({test_size} bytes)')
                 continue
             
             # Check if the hashes match
