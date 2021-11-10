@@ -1,0 +1,20 @@
+{
+    "pythonVersion": "3.9",
+    "reportTypeshedErrors": true,
+    "reportMissingImports": true,
+    "reportMissingTypeStubs": true,
+    "reportOptionalSubscript": true,
+    "reportOptionalMemberAccess": true,
+    "reportOptionalCall": true,
+    "reportUntypedFunctionDecorator": true,
+    "reportConstantRedefinition": true,
+    "reportAssertAlwaysTrue": true,
+    "reportDuplicateImport": true,
+    "reportCallInDefaultInitializer": true,
+    "reportFunctionMemberAccess": true,
+    "reportGeneralTypeIssues": true,
+    "reportImplicitStringConcatenation": true,
+    "reportImportCycles": true,
+    "reportIncompatibleMethodOverride": true,
+    "reportIncompatibleVariableOverride": true
+  }
